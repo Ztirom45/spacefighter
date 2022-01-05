@@ -1,3 +1,6 @@
+print("control: w a s d \nshot: space\nDebug:F1")
+
+
 #if compile error look at global
 import pygame, random
 import function
@@ -16,11 +19,19 @@ astoroid.img_list.append("astoroid2")
 astoroid.img_list.append("astoroid3")
 astoroid.img_bool=4
 astoroid.rect = 5
-fps = 60
+fps = 60 # max 120
 player.speed = 10 #speed of player
 
-shot = Actors(screen,"shot",[],angle=1,speed=2)
+shot = Actors(screen,"shot",[],angle=1,speed=2,friction=0.97)
+shot.fricton = 0.999999999999999
 
+def tudch_astoroid():
+    global astoroid
+    global player
+    for x in astoroid.rects:
+        if player.tudch(x[0]):
+            del(astoroid.liste[x[1]])    
+            
 def border():
     if star.playerx > 5000:#
      star.playerx = -4999
@@ -44,7 +55,6 @@ def player_shot():
     global player
     global shot
     shot.liste.append([[-(0+shot.playerx),-(0+shot.playery)],player.angle,30])
-    print(-(0+shot.playerx),-(0+shot.playery))
     
 def screen_update(fps):
     global screen
@@ -58,7 +68,7 @@ def screen_update(fps):
     shot.draw()
     player_contr(fps)
     player.draw()
-    
+    tudch_astoroid()
     pygame.display.update()
     
 
@@ -70,7 +80,6 @@ def player_contr(fps):
     global shot
     pres = pygame.key.get_pressed() 
     fps_now = clock.get_fps()
-    
     if pres[pygame.K_w]:
         star.move_player_cords(-2*player.speed)
         astoroid.move_player_cords(-2*player.speed)
@@ -95,7 +104,7 @@ def player_contr(fps):
     border()
     for l_event in events:
         if l_event.type == pygame.KEYDOWN:
-            if l_event.key == pygame.K_F5:
+            if l_event.key == pygame.K_F1:
                 if player.debug:
                     player.debug = False
                     star.debug = False
@@ -107,7 +116,7 @@ def player_contr(fps):
                     astoroid.debug = True
                     shot.debug = True
                     
-    if player.debug == True:        
+    if player.debug == True:
         screen.blit(arial.render(str(int(star.playerx))+"/"+str(int(star.playery)), True, (255,0,0)),(0,0))
         screen.blit(arial.render("fps: "+str(fps_now)+" / "+str(fps), True, (255,0,0)),(0,font_l))
     
@@ -118,7 +127,6 @@ while go:
     for l_event in events:
         if l_event.type == pygame.QUIT:
             go = False
-    print(shot.playery)
     screen_update(fps)
     clock.tick(fps)
     

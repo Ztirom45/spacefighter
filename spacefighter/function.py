@@ -1,6 +1,7 @@
 import os,pygame,math #import all
 from pickle import *
 from random import *
+from PIL import Image
 pygame.init() #init pygame
 
 def load_img(dir_path): #load all image 
@@ -39,3 +40,41 @@ def load_space(file): #load all stars
     l = load(f) # load file in list l
     f.close() #close file
     return l # gives list l return
+
+
+def get_true(image_path): #get a image with cords for every color and nothing for every trasparent
+	img = Image.open(image_path)
+	a = list(img.getdata())
+	liste = []
+	for i in range(img.size[0]):    # For every pixel:
+		for j in range(img.size[1]):
+			f = a[j*img.size[0]+i]
+			if  f != (0,0,0,0):
+				liste.append([i,j])
+
+	return liste
+def set_pos(true_img,xy):#move a trueimage to a cord
+	a = [[x[0]+xy[0],x[1]+xy[1]] for x in true_img]
+	return a
+	
+def tudch(true_img1,true_img2):#true image tudch an other
+	for x in true_img1:
+		for y in true_img2:
+			if y == x:
+				return True
+	return False
+	
+"""
+def get_true_combi(image,path="image",angle=0,zoom=1,xy=(0,0)):
+    img = pygame.image.load(path+"/"+image+".png")
+    img = pygame.transform.rotozoom(img,angle,zoom)
+    img.scroll(dx=xy[0], dy=xy[1])
+    #print(img)
+    pygame.image.save(img,path+"/"+image+"combi.png")
+    #img = 
+    return get_true(path+"/"+image+"combi.png")
+    #return set_pos(img,xy)
+"""
+#for x in range(100):
+#    a = get_true_combi("astoroid1",angle=33,zoom=10,xy=(200,200))
+#    print(x)
