@@ -76,6 +76,7 @@ class Actors: #class for star, astoroids, ...
         self.sc_wh = (1024,710)
         self.rect = 0
         self.rects = []
+        self.rectsave = 0
         
     def draw(self):
         img1 = self.img_dict[self.img]
@@ -100,10 +101,11 @@ class Actors: #class for star, astoroids, ...
                   img2 = pygame.transform.rotozoom(img1,-i[self.angle],1)
                 elif self.scale:
                   img2 = pygame.transform.rotozoom(img1,0,i[self.scale])
-                rectsave = img2.get_rect()
-                rectsave.x = i[self.xy][0]+self.playerx+self.playerpos[0]
-                rectsave.y = i[self.xy][1]+self.playery+self.playerpos[1]
-                self.rects.append([rectsave,conter])
+                if self.rectsave:
+                  rectsave = img2.get_rect()
+                  rectsave.x = i[self.xy][0]+self.playerx+self.playerpos[0]
+                  rectsave.y = i[self.xy][1]+self.playery+self.playerpos[1]
+                  self.rects.append([rectsave,conter])
                   
                 self.screen.blit(img2,(i[self.xy][0]+self.playerx+self.playerpos[0],i[self.xy][1]+self.playery+self.playerpos[1]))
                 if self.debug:

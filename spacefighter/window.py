@@ -12,15 +12,18 @@ arial = pygame.font.SysFont('arial', font_l)
 screen = pygame.display.set_mode((1024,710))
 clock = pygame.time.Clock()
 player = Actor(screen,'prismfighter')
+
 stars,astoroids = function.load_space("space")
 star = Actors(screen,"star",stars)
+
 astoroid = Actors(screen,"astoroid1",astoroids,angle=1,speed=2,scale=3,costume=4)
 astoroid.img_list.append("astoroid2")
 astoroid.img_list.append("astoroid3")
 astoroid.img_bool=4
 astoroid.rect = 5
+astoroid.rectsave = 1
+
 fps = 60 # max 120
-player.speed = 10 #speed of player
 
 shot = Actors(screen,"shot",[],angle=1,speed=2,friction=0.97)
 shot.fricton = 0.999999999999999
@@ -80,15 +83,8 @@ def player_contr(fps):
     global shot
     pres = pygame.key.get_pressed() 
     fps_now = clock.get_fps()
-    if pres[pygame.K_w]:
-        star.move_player_cords(-2*player.speed)
-        astoroid.move_player_cords(-2*player.speed)
-        shot.move_player_cords(-2*player.speed)
-        
-    if pres[pygame.K_s]:
-     star.move_player_cords(player.speed)
-     astoroid.move_player_cords(player.speed)
-     shot.move_player_cords(player.speed)
+    if pres[pygame.K_w] and player.speed< 10:player.speed += 0.1
+    if pres[pygame.K_s] and player.speed>-10:player.speed -= 0.1
     if pres[pygame.K_d]:
      player.angle += player.speed
      star.player_angle += player.speed
@@ -101,6 +97,10 @@ def player_contr(fps):
      shot.player_angle -= player.speed
     if pres[pygame.K_SPACE]:
         player_shot()
+    
+    star.move_player_cords(-2*player.speed)
+    astoroid.move_player_cords(-2*player.speed)
+    shot.move_player_cords(-2*player.speed)
     border()
     for l_event in events:
         if l_event.type == pygame.KEYDOWN:
