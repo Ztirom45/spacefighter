@@ -1,6 +1,7 @@
 import pygame
 from math import *
-import function
+import function, time
+from array_functions import *
 
 class Actor: #class for player, ...
     def __init__(self,screen,img,xy=(512,350),angle=0,scale=1,health=10,maxspeed=10,speed=0):#init, paramete
@@ -50,9 +51,8 @@ class Actor: #class for player, ...
         self.rect.y = self.y-ry
         return pygame.Rect.colliderect(self.rect,rect)
 
-
 class Actors: #class for star, astoroids, ...
-    def __init__(self,screen,img,liste,player=(512,350,0),xy=0,angle=0,scale=0,health=0,maxspeed=0,speed=0,costume=0,friction=1):#init, parameter
+    def __init__(self,screen,img,liste,player=(512,350,0),xy=0,angle=0,scale=0,health=0,maxspeed=0,speed=10,costume=0,rect=0,friction=1):#init, parameter
         
         self.img_dict = function.load_img("image") #dict
         self.img = img
@@ -69,23 +69,26 @@ class Actors: #class for star, astoroids, ...
         self.debug = False
         self.playerx = player[0]
         self.playery = player[1]
-        self.playerpos = (512,350)
+        self.playerpos = [player[0],player[1]]
         self.player_angle = player[2]
         self.liste = liste
         self.costume=costume
         self.sc_wh = (1024,710)
-        self.rect = 0
+        self.rect = rect
         self.rects = []
         self.rectsave = 0
+        self.std_rotozoom = [0,1]
         
     def draw(self):
         img1 = self.img_dict[self.img]
+        
+        if self.std_rotozoom != [0,1]:img1 = pygame.transform.rotozoom(img1,self.std_rotozoom[0],self.std_rotozoom[1])
+        
         img2 = img1
         self.rects = []
-        #print(self.rects)
         conter = 0
+        #
         for i in self.liste:                        
-            
 
             if all((
                     i[self.xy][0]+self.playerx < self.sc_wh[0],
@@ -93,8 +96,10 @@ class Actors: #class for star, astoroids, ...
                     i[self.xy][1]+self.playery< self.sc_wh[1],
                     i[self.xy][1]+self.playery+self.playerpos[1] > 0
                     )):
-                if self.img_bool:
-                    img1 = self.img_dict[self.img_list[i[self.img_bool]]]
+                if(self.costume):
+                  img1 = self.img_dict[self.img_list[i[self.costume]]]
+                  if self.std_rotozoom != [0,1]:img1 = pygame.transform.rotozoom(img1,self.std_rotozoom[0],self.std_rotozoom[1])
+                img2 = img1
                 if self.scale and self.angle:            
                     img2 = pygame.transform.rotozoom(img1,-i[self.angle],i[self.scale])#
                 elif self.angle:
@@ -102,17 +107,14 @@ class Actors: #class for star, astoroids, ...
                 elif self.scale:
                   img2 = pygame.transform.rotozoom(img1,0,i[self.scale])
                 if self.rectsave:
-                  rectsave = img2.get_rect()
-                  rectsave.x = i[self.xy][0]+self.playerx+self.playerpos[0]
-                  rectsave.y = i[self.xy][1]+self.playery+self.playerpos[1]
-                  self.rects.append([rectsave,conter])
-                  
+                  i[self.rect] = img2.get_rect()
+                  i[self.rect].x = i[self.xy][0]+self.playerx+self.playerpos[0]
+                  i[self.rect].y = i[self.xy][1]+self.playery+self.playerpos[1]
+                  self.rects.append([i[self.rect],conter])
                 self.screen.blit(img2,(i[self.xy][0]+self.playerx+self.playerpos[0],i[self.xy][1]+self.playery+self.playerpos[1]))
                 if self.debug:
                   if self.rect:pygame.draw.rect(self.screen,(255,0,0),(i[self.xy][0]+self.playerx+self.playerpos[0],i[self.xy][1]+self.playery+self.playerpos[1],i[self.rect][2],i[self.rect][3]),1)   
                   else:pygame.draw.rect(self.screen,(255,0,0),(i[self.xy][0]+self.playerx+self.playerpos[0],i[self.xy][1]+self.playery+self.playerpos[1],img2.get_rect().w,img2.get_rect().h),1)
-                if img2.get_rect().collidepoint(self.playerx+self.playerpos[0],self.playery+self.playerpos[1]):
-                    print("hi")
             conter += 1      
     def move_self(self):
       z = 0
@@ -121,7 +123,6 @@ class Actors: #class for star, astoroids, ...
           i[self.xy][1] += sin(i[self.angle]/180*pi)*i[self.speed]
           
           i[self.speed] *= self.friction
-
           if i[self.xy][0] > 5000:#
              i[self.xy][0] = -4999
           if i[self.xy][0] < -5000:#
@@ -133,6 +134,8 @@ class Actors: #class for star, astoroids, ...
           if self.img == "shot":
             if i[self.speed] < 1:
               del(self.liste[z])
+              
+              break
               z += 1
                          
     def move_player_cords(self,steps):
@@ -142,3 +145,71 @@ class Actors: #class for star, astoroids, ...
           
     def change_costume(self,costume):
         self.img = costume
+    
+    def tudch_pos(self,pos):
+      z = 0
+      img1 = self.img_dict[self.img]
+      if self.std_rotozoom != [0,1]:img1 = pygame.transform.rotozoom(img1,self.std_rotozoom[0],self.std_rotozoom[1])
+      img2 = img1
+      for i in self.liste:
+        if(self.costume):
+          img1 = self.img_dict[self.img_list[i[self.costume]]]
+          if self.std_rotozoom != [0,1]:img1 = pygame.transform.rotozoom(img1,self.std_rotozoom[0],self.std_rotozoom[1])
+        img2 = img1
+        if self.scale and self.angle:            
+            img2 = pygame.transform.rotozoom(img1,-i[self.angle],i[self.scale])#
+        elif self.angle:
+          img2 = pygame.transform.rotozoom(img1,-i[self.angle],1)
+        elif self.scale:
+          img2 = pygame.transform.rotozoom(img1,0,i[self.scale])
+        rect1 = img2.get_rect()
+        rect1.x,rect1.y = add2_pos(i[self.xy],self.playerpos) #y = rect i = list i.y = rect.y = i.x = rect.x
+        rect1.x += self.playerx
+        rect1.y += self.playery
+        if rect1.collidepoint(pos):
+            return [z]
+        z+=1
+        pass
+
+class Iconbar():
+  def __init__(self,screen,img,count,maxcount,rect,rot=0,scale=1,ofimg=0,bagground=0,box=0,boxsize=0):
+    self.screen = screen
+    self.img_dict = function.load_img("image") #dict
+    self.img = img
+    self.count = count
+    self.maxcount = maxcount
+    self.rect = rect
+    self.bagground = bagground
+    self.box = box
+    self.boxsize = boxsize 
+    self.icon_abs = rect.w/maxcount
+    self.rot = rot
+    self.scale = scale
+    self.ofimg = ofimg
+  def draw(self):
+    self.icon_abs = self.rect.w/self.maxcount
+    if self.bagground:pygame.draw.rect(self.screen,self.bagground,self.rect)
+    if self.box:pygame.draw.rect(self.screen,self.box,self.rect,self.boxsize)
+    if self.rot != 0 or self.scale != 1:
+      img2 = pygame.transform.rotozoom(self.img_dict[self.img],self.rot,self.scale)
+      if self.ofimg:img3 = pygame.transform.rotozoom(self.img_dict[self.ofimg],self.rot,self.scale)
+      for i in range(self.maxcount):
+        if i < self.count:self.screen.blit(img2,(i*self.icon_abs+self.rect.x,self.rect.y))
+        elif self.ofimg:self.screen.blit(img3,(i*self.icon_abs+self.rect.x,self.rect.y))
+    else:  
+      for i in range(self.maxcount):
+        if i < self.count:self.screen.blit(self.img_dict[self.img],(i*self.icon_abs+self.rect.x,self.rect.y))
+        elif self.ofimg:self.screen.blit(self.img_dict[self.ofimg],(i*self.icon_abs+self.rect.x,self.rect.y))
+
+class Timer:
+	def __init__(self):
+		self._start_time = 0
+
+	def start(self):
+		self._start_time = time.perf_counter()
+		
+	def get_time(self):
+		return time.perf_counter() - self._start_time
+
+
+

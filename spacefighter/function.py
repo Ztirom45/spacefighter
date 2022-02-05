@@ -14,13 +14,20 @@ def load_img(dir_path): #load all image
     return img #givs the image
 def reset_space(file): #create random stars
     f = open(file+".dat","bw") #open file
-    a = [[[randint(-5000,5000),randint(-5000,5000)]] for x in range(5000)]
+    a = [[[randint(-6000,6000),randint(-6000,6000)]] for x in range(5000)]
     b = [[[randint(-5000,5000),
             randint(-5000,5000)],
            randint(0,360),
            randint(0,11),
            randint(5,15)/10,
            randint(0,2)] for x in range(500)]
+
+    d = [[[randint(-5000,5000), #spaceships
+            randint(-5000,5000)],
+           randint(0,360),
+           randint(0,11),
+           3,
+           randint(0,1)] for x in range(50)]
     img_dict = load_img("image")
     img_list = [
         "astoroid1",
@@ -31,11 +38,25 @@ def reset_space(file): #create random stars
               c = pygame.transform.rotozoom(c,-x[1],x[3])
               x.append(tuple(c.get_rect()))
               
-    dump([a,b],f)
+    dump([a,b,d],f)
+    f.close() #write random stars in file
+    
+
+def reset_player(file): #create random stars
+    f = open(file+".dat","bw") #open file
+    fellts = 104
+    dist=22*3
+    a = int(fellts/10)
+    b = [ [[x*dist,y*dist],0,1] for y in range(10) for x in range(a)]
+    for y in range(fellts-a*10):b.append([[y*dist,a*dist],0,1])
+    b[len(b)-1][2] = 4
+    dump([[0,0,90,10],["void"],b],f)#player pos, angele iteam list, inventory
     f.close() #write random stars in file
 
-def load_space(file): #load all stars
+def load_file(file): #load all stars
     f = open(file+".dat","rb") #open file
     l = load(f) # load file in list l
     f.close() #close file
     return l # gives list l return
+
+#reset_space("space")
