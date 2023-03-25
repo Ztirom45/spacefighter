@@ -11,4 +11,4 @@ a space game written in python using pygame
 
 ##### run:
 - `$ python3 window.py`
-- maybe you need to install liberrys `pip install pygame Pillow`
+- maybe you need to install liberrys `$ pip install pygame Pillow`
