@@ -1,4 +1,14 @@
-# spacefighter
-a space-game writen in python
+# space-fighters
 
-you can control with WASD,shot with space and open the inventory with E.
+a space game written in python using pygame
+
+![screenshot](https://github.com/Ztirom45/spacefighter/blob/main/image/screenshot1.png)
+
+##### Features:
+- Astoroids
+- invinit space
+- Inventory
+
+##### run:
+- `$ python3 window.py`
+- maybe you need to install liberrys `pip install pygame Pillow`
